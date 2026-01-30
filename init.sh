@@ -1,8 +1,41 @@
 #!/bin/bash
 
+set -e
+
 # Configurable Kubernetes version (major.minor, e.g., 1.32, 1.31, 1.30)
 # Find latest versions at: https://kubernetes.io/releases/
 K8S_VERSION="${K8S_VERSION:-1.32}"
+
+# Validate OS is Ubuntu
+if [ ! -f /etc/os-release ]; then
+  echo "Error: Cannot determine OS. /etc/os-release not found."
+  exit 1
+fi
+
+source /etc/os-release
+if [ "$ID" != "ubuntu" ]; then
+  echo "Error: This script only supports Ubuntu. Detected OS: $ID"
+  exit 1
+fi
+
+echo "Detected Ubuntu $VERSION_ID"
+
+# Validate Kubernetes version format
+if ! [[ "$K8S_VERSION" =~ ^[0-9]+\.[0-9]+$ ]]; then
+  echo "Error: Invalid Kubernetes version format: $K8S_VERSION"
+  echo "Expected format: major.minor (e.g., 1.32, 1.31)"
+  exit 1
+fi
+
+# Validate Kubernetes version is available by checking repository
+echo "Validating Kubernetes version $K8S_VERSION..."
+if ! curl -fsSL --head "https://pkgs.k8s.io/core:/stable:/v${K8S_VERSION}/deb/Release.key" >/dev/null 2>&1; then
+  echo "Error: Kubernetes version v$K8S_VERSION repository not found."
+  echo "Check available versions at: https://kubernetes.io/releases/"
+  exit 1
+fi
+
+echo "Using Kubernetes version: $K8S_VERSION"
 
 # Create directory for APT repository signing keys
 mkdir -p /etc/apt/keyrings
