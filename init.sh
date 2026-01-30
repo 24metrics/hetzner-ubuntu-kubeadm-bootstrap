@@ -21,4 +21,4 @@ sysctl -w net.ipv4.ip_forward=1
 echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
 sysctl -p
 
-curl -fsSL https://raw.githubusercontent.com/migueltanada/ubuntu-kubeadm-bootstrap/refs/heads/main/init.yaml -o /tmp/init.yaml
+curl -fsSL https://raw.githubusercontent.com/24metrics/hetzner-ubuntu-kubeadm-bootstrap/refs/heads/main/init.yaml -o /tmp/init.yaml
